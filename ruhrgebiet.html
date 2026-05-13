@@ -31,8 +31,9 @@
         h1 { font-size: 80px; margin: 0 0 30px 0; opacity: 0; transition: opacity 1s ease; }
         
         #einleitung {
-            font-size: 30px;
+            font-size: 26px;
             max-width: 800px;
+            line-height: 1.5;
             margin: 0 auto 30px auto;
             opacity: 0;
             transition: opacity 1s ease;
@@ -77,18 +78,25 @@
         .option p { font-size: 30px; margin: 0; opacity: 0; display: none; transition: opacity 0.8s ease; }
 
         /* Detail Screen Elemente */
-        #inputArea { margin-bottom: 30px; }
+        #inputArea { margin-bottom: 20px; }
         input { 
             padding: 10px; font-size: 24px; border-radius: 5px; border: none; width: 150px; text-align: center;
             background: #222; color: white; border: 1px solid #444;
         }
-        #displayImage { max-width: 600px; max-height: 400px; margin: 20px; border-radius: 15px; display: none; }
+        #displayImage { max-width: 500px; max-height: 300px; margin: 20px; border-radius: 15px; display: none; border: 2px solid #444; }
 
-        #backLink { color: #888; font-size: 24px; cursor: pointer; margin-top: 30px; }
+        /* NEU: Styling für die Beschreibung */
+        #imageDescription {
+            max-width: 700px;
+            font-size: 22px;
+            line-height: 1.4;
+            color: #ddd;
+            margin: 10px 0 20px 0;
+            min-height: 60px;
+        }
+
+        #backLink { color: #888; font-size: 24px; cursor: pointer; margin-top: 10px; }
         #backLink:hover { color: white; }
-
-        /* Versteckte Bilddaten */
-        .investition { display: none; }
     </style>
 </head>
 <body>
@@ -127,6 +135,9 @@
         </div>
         
         <img id="displayImage" src="" alt="Ergebnis">
+        
+        <!-- NEU: Platzhalter für die Beschreibung -->
+        <div id="imageDescription"></div>
 
         <div id="backLink" onclick="goBack()"> < zurück </div>
     </div>
@@ -134,14 +145,35 @@
     <script>
         let currentCategory = "";
 
-        // Mapping der Bilder zu Kategorien und Werten
         const imagePaths = {
             bildung: ["Downloads/zerstört_schule.png", "Downloads/saniert.png", "Downloads/bau.png", "Downloads/elite.png"],
             wirtschaft: ["Downloads/keine_jobs.png", "Downloads/ansiedlung.png", "Downloads/technologie.png", "Downloads/weltkonzern.png"],
             zeche: ["Downloads/abbriss_zeche.png", "Downloads/langsamer_rückbau.png", "Downloads/modernisirung_zeche.png", "Downloads/hightech.png"]
         };
 
-        // --- Start Animationen ---
+        // NEU: Beschreibungen für die Folgen
+        const descriptions = {
+            bildung: [
+                "Folge: Die Schulen verfallen. Fachkräftemangel wird die Zukunft der Stadt gefährden.",
+                "Folge: Notwendige Reparaturen werden durchgeführt..",
+                "Folge: Moderne Gebaüde und neue Labore entstehen. Die Jugend ist besser qualifiziert.",
+                "Folge: Eine verbesserte Uni entsteht. Forscher aus aller Welt kommen ins Ruhrgebiet!"
+            ],
+            wirtschaft: [
+                "Folge: Firmen wandern ab. Die Arbeitslosigkeit steigt massiv an.",
+                "Folge: Kleinere Betriebe siedeln sich an. Die Wirtschaft bleibt stabil.",
+                "Folge: Ein Technologiepark entsteht. Neue, moderne Jobs werden geschaffen.",
+                "Folge: Ein Weltkonzern baut seine Zentrale hier. Das Ruhrgebiet wird zum Wirtschaftsmotor."
+            ],
+            zeche: [
+                "Folge: Die Zeche wird verlassen. Ruinen prägen das Stadtbild.",
+                "Folge: Sozialverträglicher Rückbau. Die Bergleute haben Zeit für Umschulungen.",
+                "Folge: Die Zeche wird hochmodern. Sie bleibt noch Jahre konkurrenzfähig.",
+                "Folge: Hightech-Bergbau auf Weltniveau. Maximale Effizienz durch Automatisierung."
+            ]
+        };
+
+        // Start Animationen
         setTimeout(() => { document.getElementById('meinTitel').style.opacity = '1'; }, 300);
         setTimeout(() => {
             const e = document.getElementById('einleitung');
@@ -172,24 +204,26 @@
             }, delay);
         }
 
-        // --- Logik für Details ---
         function openDetail(category) {
             currentCategory = category;
             document.getElementById('gameScreen').style.display = 'none';
             document.getElementById('detailScreen').style.display = 'flex';
             document.getElementById('moneyInput').value = "";
             document.getElementById('displayImage').style.display = 'none';
+            document.getElementById('imageDescription').innerText = ""; // Text leeren
             
-            const titles = { bildung: "Bildung", wirtschaft: "Wirtschaft", zeche: "Zeche" };
-            document.getElementById('detailTitle').innerText = titles[category] + " Investition";
+            const titles = { bildation: "Bildung", wirtschaft: "Wirtschaft", zeche: "Zeche" };
+            document.getElementById('detailTitle').innerText = (category.charAt(0).toUpperCase() + category.slice(1)) + "-Investition";
         }
 
         function updateResult() {
             const val = parseInt(document.getElementById('moneyInput').value);
             const imgElement = document.getElementById('displayImage');
+            const descElement = document.getElementById('imageDescription');
             
             if (isNaN(val)) {
                 imgElement.style.display = 'none';
+                descElement.innerText = "";
                 return;
             }
 
@@ -199,8 +233,11 @@
             else if (val <= 80) index = 2;
             else index = 3;
 
+            // Bild und Beschreibung aktualisieren
             imgElement.src = imagePaths[currentCategory][index];
             imgElement.style.display = 'block';
+            
+            descElement.innerText = descriptions[currentCategory][index];
         }
 
         function goBack() {
